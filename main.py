@@ -41,13 +41,13 @@ def check_system_requirements(
     Check system requirements before running the agent.
 
     Checks:
-    1. ADB/HDC/iOS tools installed
-    2. At least one device connected
+    1. ADB/HDC/iOS tools installed (not needed for BLE HTTP)
+    2. At least one device connected (not needed for BLE HTTP)
     3. ADB Keyboard installed on the device (for ADB only)
     4. WebDriverAgent running (for iOS only)
 
     Args:
-        device_type: Type of device tool (ADB, HDC, or IOS).
+        device_type: Type of device tool (ADB, HDC, IOS, or BLE_HTTP).
         wda_url: WebDriverAgent URL (for iOS only).
 
     Returns:
@@ -55,6 +55,18 @@ def check_system_requirements(
     """
     print("🔍 Checking system requirements...")
     print("-" * 50)
+
+    # For BLE HTTP, skip all system checks
+    if device_type == DeviceType.BLE_HTTP:
+        print("1. Skipping system checks for BLE HTTP...", end=" ")
+        print("✅ OK")
+        print("2. Skipping device connection check for BLE HTTP...", end=" ")
+        print("✅ OK")
+        print("3. Skipping keyboard check for BLE HTTP...", end=" ")
+        print("✅ OK")
+        print("-" * 50)
+        print("✅ All system checks passed!\n")
+        return True
 
     all_passed = True
 
@@ -398,6 +410,13 @@ Examples:
 
     # Pair with iOS device
     python main.py --device-type ios --pair
+
+    # BLE HTTP specific examples
+    # Run with BLE HTTP device
+    python main.py --device-type blehttp --blehttp-url http://192.168.0.115:9123 "Open Meituan and search for nearby hot pot restaurants"
+
+    # Specify BLE HTTP server URL
+    python main.py --device-type blehttp --blehttp-url http://192.168.1.100:9123 "Open WeChat and send a message"
         """,
     )
 
@@ -477,6 +496,14 @@ Examples:
         help="WebDriverAgent URL for iOS (default: http://localhost:8100)",
     )
 
+    # BLE HTTP specific options
+    parser.add_argument(
+        "--blehttp-url",
+        type=str,
+        default=os.getenv("PHONE_AGENT_BLEHTTP_URL", "http://192.168.0.115:9123"),
+        help="BLE HTTP server URL (default: http://192.168.0.115:9123)",
+    )
+
     parser.add_argument(
         "--pair",
         action="store_true",
@@ -509,9 +536,9 @@ Examples:
     parser.add_argument(
         "--device-type",
         type=str,
-        choices=["adb", "hdc", "ios"],
+        choices=["adb", "hdc", "ios", "blehttp"],
         default=os.getenv("PHONE_AGENT_DEVICE_TYPE", "adb"),
-        help="Device type: adb for Android, hdc for HarmonyOS, ios for iPhone (default: adb)",
+        help="Device type: adb for Android, hdc for HarmonyOS, ios for iPhone, blehttp for BLE HTTP (default: adb)",
     )
 
     parser.add_argument(
@@ -609,12 +636,32 @@ def handle_device_commands(args) -> bool:
     device_type = (
         DeviceType.ADB
         if args.device_type == "adb"
-        else (DeviceType.HDC if args.device_type == "hdc" else DeviceType.IOS)
+        else (DeviceType.HDC if args.device_type == "hdc" else 
+              (DeviceType.BLE_HTTP if args.device_type == "blehttp" else DeviceType.IOS))
     )
 
     # Handle iOS-specific commands
     if device_type == DeviceType.IOS:
         return handle_ios_device_commands(args)
+
+    # For BLE HTTP, skip device commands
+    if device_type == DeviceType.BLE_HTTP:
+        if args.list_devices:
+            print("BLE HTTP does not support listing devices.")
+            print("Please use the /connect endpoint to connect to a device.")
+            return True
+        elif args.connect:
+            print("BLE HTTP uses MAC address for connection.")
+            print("Please use the /connect endpoint with mac parameter.")
+            return True
+        elif args.disconnect:
+            print("BLE HTTP does not support disconnect command.")
+            print("Please use the appropriate BLE HTTP endpoint.")
+            return True
+        elif args.enable_tcpip:
+            print("BLE HTTP does not support TCP/IP debugging.")
+            return True
+        return False
 
     device_factory = get_device_factory()
     ConnectionClass = device_factory.get_connection_class()
@@ -683,6 +730,13 @@ def handle_device_commands(args) -> bool:
 
 def main():
     """Main entry point."""
+    import logging
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
     args = parse_args()
 
     # Set device type globally based on args
@@ -690,12 +744,17 @@ def main():
         device_type = DeviceType.ADB
     elif args.device_type == "hdc":
         device_type = DeviceType.HDC
+    elif args.device_type == "blehttp":
+        device_type = DeviceType.BLE_HTTP
     else:  # ios
         device_type = DeviceType.IOS
 
     # Set device type globally for non-iOS devices
     if device_type != DeviceType.IOS:
-        set_device_type(device_type)
+        if device_type == DeviceType.BLE_HTTP:
+            set_device_type(device_type, args.blehttp_url)
+        else:
+            set_device_type(device_type)
 
     # Enable HDC verbose mode if using HDC
     if device_type == DeviceType.HDC:
@@ -784,6 +843,8 @@ def main():
     print("=" * 50)
     if device_type == DeviceType.IOS:
         print("Phone Agent iOS - AI-powered iOS automation")
+    elif device_type == DeviceType.BLE_HTTP:
+        print("Phone Agent BLE HTTP - AI-powered phone automation")
     else:
         print("Phone Agent - AI-powered phone automation")
     print("=" * 50)
@@ -807,6 +868,12 @@ def main():
             print(f"Device: {device.device_name or device.device_id[:16]}")
             if device.model and device.ios_version:
                 print(f"        {device.model}, iOS {device.ios_version}")
+    elif device_type == DeviceType.BLE_HTTP:
+        print(f"BLE HTTP Server: {args.blehttp_url}")
+        if agent_config.device_id:
+            print(f"Device: {agent_config.device_id}")
+        else:
+            print("Device: BLE HTTP (connection via /connect endpoint)")
     else:
         device_factory = get_device_factory()
         devices = device_factory.list_devices()
