@@ -10,6 +10,9 @@ from PIL import Image
 # Configure logger
 logger = logging.getLogger(__name__)
 
+# Import connection manager
+from phone_agent.bleHttp.device import ensure_connected
+
 
 @dataclass
 class Screenshot:

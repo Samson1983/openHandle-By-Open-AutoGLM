@@ -43,6 +43,8 @@ class BLEConnection:
             base_url: Base URL of the BLE HTTP server (e.g., "http://192.168.0.115:9123").
         """
         self.base_url = base_url.rstrip("/")
+        self.connected = False
+        self.system_info = None
 
     def connect(self, mac: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -60,6 +62,7 @@ class BLEConnection:
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         logger.info(f"BLE HTTP: Connect response: {response.json()}")
+        self.connected = True
         return response.json()
 
     def get_state(self) -> Dict[str, Any]:
@@ -83,23 +86,29 @@ class BLEConnection:
         Returns:
             Response from the server as a dictionary.
         """
-        url = f"{self.base_url}/systeminfo"
-        logger.info("BLE HTTP: Getting system information")
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        logger.info(f"BLE HTTP: System info response: {response.json()}")
-        return response.json()
+        if self.system_info is None:
+            url = f"{self.base_url}/systeminfo"
+            logger.info("BLE HTTP: Getting system information")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            self.system_info = response.json()
+            logger.info(f"BLE HTTP: System info response: {self.system_info}")
+        return self.system_info
 
-    def get_app_list(self) -> Dict[str, Any]:
+    def get_app_list(self, system: str | None = None) -> Dict[str, Any]:
         """
         Get list of installed applications.
+
+        Args:
+            system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
 
         Returns:
             Response from the server as a dictionary.
         """
         url = f"{self.base_url}/applist"
-        logger.info("BLE HTTP: Getting app list")
-        response = requests.get(url, timeout=10)
+        params = {} if system is None else {"system": system}
+        logger.info(f"BLE HTTP: Getting app list with system filter: {system}")
+        response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         logger.info(f"BLE HTTP: App list response: {response.json()}")
         return response.json()
@@ -134,3 +143,19 @@ def get_state(base_url: str) -> Dict[str, Any]:
     logger.info(f"BLE HTTP: Getting state from {base_url}")
     conn = BLEConnection(base_url)
     return conn.get_state()
+
+
+def get_app_list(base_url: str, system: str | None = None) -> Dict[str, Any]:
+    """
+    Quick helper to get app list.
+
+    Args:
+        base_url: Base URL of the BLE HTTP server.
+        system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
+
+    Returns:
+        Response from the server as a dictionary.
+    """
+    logger.info(f"BLE HTTP: Getting app list from {base_url} with system filter: {system}")
+    conn = BLEConnection(base_url)
+    return conn.get_app_list(system)

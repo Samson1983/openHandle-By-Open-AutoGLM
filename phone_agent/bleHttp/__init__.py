@@ -5,6 +5,7 @@ from phone_agent.bleHttp.connection import (
     DeviceInfo,
     connect,
     get_state,
+    get_app_list,
 )
 from phone_agent.bleHttp.device import (
     back,
@@ -13,6 +14,7 @@ from phone_agent.bleHttp.device import (
     recent_apps,
     swipe,
     tap,
+    open_app,
 )
 from phone_agent.bleHttp.input import (
     copy,
@@ -27,6 +29,7 @@ __all__ = [
     "DeviceInfo",
     "connect",
     "get_state",
+    "get_app_list",
     # Device control
     "tap",
     "swipe",
@@ -34,6 +37,7 @@ __all__ = [
     "back",
     "home",
     "recent_apps",
+    "open_app",
     # Input
     "type_text",
     "copy",

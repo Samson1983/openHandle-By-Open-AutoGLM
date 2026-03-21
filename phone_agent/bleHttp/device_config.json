@@ -1,0 +1,66 @@
+{
+  "device_configs": {
+    "Redmi Truo3": {
+      "android_16": {
+        "home": {
+          "key1": "0x87",
+          "key2": "0xB0",
+          "duration": 100
+        },
+        "back": {
+          "key1": "0x87",
+          "key2": "0xB1",
+          "duration": 50
+        },
+        "recent_apps": {
+          "key1": "0x87",
+          "key2": "0xB3",
+          "duration": 50
+        }
+      }
+    },
+    "Redmi Note Pro9": {
+      "android_12": {
+        "home": {
+          "endpoint": "/home"
+        },
+        "back": {
+          "endpoint": "/back"
+        },
+        "recent_apps": {
+          "endpoint": "/recents"
+        }
+      }
+    },
+    "M2007J17C": {
+      "android_12": {
+        "home": {
+          "endpoint": "/home"
+        },
+        "back": {
+          "endpoint": "/back"
+        },
+        "recent_apps": {
+          "endpoint": "/recents"
+        }
+      }
+    }
+  },
+  "default_config": {
+    "home": {
+      "key1": "0x87",
+      "key2": "0xB0",
+      "duration": 100
+    },
+    "back": {
+      "key1": "0x87",
+      "key2": "0xB1",
+      "duration": 50
+    },
+    "recent_apps": {
+      "key1": "0x87",
+      "key2": "0xB3",
+      "duration": 50
+    }
+  }
+}

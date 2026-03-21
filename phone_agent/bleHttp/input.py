@@ -7,6 +7,9 @@ from typing import Dict, Any
 # Configure logger
 logger = logging.getLogger(__name__)
 
+# Import connection manager
+from phone_agent.bleHttp.device import ensure_connected
+
 
 def copy(base_url: str) -> Dict[str, Any]:
     """
@@ -18,6 +21,7 @@ def copy(base_url: str) -> Dict[str, Any]:
     Returns:
         Response from the server as a dictionary.
     """
+    ensure_connected(base_url)
     url = f"{base_url}/copy"
     logger.info("BLE HTTP: Copying text")
     response = requests.get(url, timeout=10)
@@ -36,6 +40,7 @@ def paste(base_url: str) -> Dict[str, Any]:
     Returns:
         Response from the server as a dictionary.
     """
+    ensure_connected(base_url)
     url = f"{base_url}/paste"
     logger.info("BLE HTTP: Pasting text")
     response = requests.get(url, timeout=10)
@@ -57,6 +62,7 @@ def type_text(base_url: str, x: int, y: int, content: str) -> Dict[str, Any]:
     Returns:
         Response from the server as a dictionary.
     """
+    ensure_connected(base_url)
     url = f"{base_url}/input/text"
     params = {"x": x, "y": y, "content": content}
     logger.info(f"BLE HTTP: Typing text at ({x}, {y}): {content}")

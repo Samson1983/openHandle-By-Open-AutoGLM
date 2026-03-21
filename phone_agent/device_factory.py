@@ -133,19 +133,25 @@ class DeviceFactory:
     ) -> bool:
         """Launch an app."""
         if self.device_type == DeviceType.BLE_HTTP:
-            # For BLE HTTP, we'll simulate app launch by going home first
-            # This assumes the app icon is accessible from the home screen
             import time
             logger = logging.getLogger(__name__)
             logger.info(f"BLE HTTP: Launching app '{app_name}'")
-            # Go home to access app icons
-            self.home(device_id, delay)
-            # Wait for home screen to load
-            time.sleep(1.0)
-            # For now, we'll just return True since we can't directly launch apps via BLE HTTP
-            # In a real implementation, we would need to tap on the app icon
-            logger.info(f"BLE HTTP: App '{app_name}' launch initiated")
-            return True
+            
+            # Get app package from APP_PACKAGES
+            from phone_agent.config.apps import APP_PACKAGES
+            if app_name in APP_PACKAGES:
+                package = APP_PACKAGES[app_name]
+                try:
+                    self.module.open_app(self.blehttp_url, package)
+                    logger.info(f"BLE HTTP: App '{app_name}' launched successfully")
+                    time.sleep(1.0)  # Wait for app to load
+                    return True
+                except Exception as e:
+                    logger.error(f"BLE HTTP: Failed to launch app '{app_name}': {e}")
+                    return False
+            else:
+                logger.error(f"BLE HTTP: App '{app_name}' not found in APP_PACKAGES")
+                return False
         return self.module.launch_app(app_name, device_id, delay)
 
     def type_text(self, text: str, device_id: str | None = None):
@@ -183,6 +189,19 @@ class DeviceFactory:
             # BLE HTTP doesn't support listing devices
             return []
         return self.module.list_devices()
+
+    def get_app_list(self, device_id: str | None = None, system: str | None = None):
+        """Get list of installed applications.
+        
+        Args:
+            device_id: Optional device ID.
+            system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
+        """
+        if self.device_type == DeviceType.BLE_HTTP:
+            return self.module.get_app_list(self.blehttp_url, system)
+        # For ADB and other device types, return empty list for now
+        # In the future, we could implement this for other device types
+        return []
 
     def get_connection_class(self):
         """Get the connection class (ADBConnection, HDCConnection, or BLEConnection)."""

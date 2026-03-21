@@ -143,6 +143,18 @@ class PhoneAgent:
         device_factory = get_device_factory()
         screenshot = device_factory.get_screenshot(self.agent_config.device_id)
         current_app = device_factory.get_current_app(self.agent_config.device_id)
+        
+        # Get app list
+        try:
+            # Get all apps (including system apps)
+            app_list = device_factory.get_app_list(self.agent_config.device_id, system="all")
+            # Extract app names from app_list if it's a dict with 'data' key
+            if isinstance(app_list, dict) and 'data' in app_list:
+                app_names = [app.get('name') for app in app_list['data'] if app.get('name')]
+            else:
+                app_names = []
+        except Exception as e:
+            app_names = []
 
         # Build messages
         if is_first:
@@ -150,7 +162,7 @@ class PhoneAgent:
                 MessageBuilder.create_system_message(self.agent_config.system_prompt)
             )
 
-            screen_info = MessageBuilder.build_screen_info(current_app)
+            screen_info = MessageBuilder.build_screen_info(current_app, installed_apps=app_names)
             text_content = f"{user_prompt}\n\n{screen_info}"
 
             self._context.append(
@@ -159,7 +171,7 @@ class PhoneAgent:
                 )
             )
         else:
-            screen_info = MessageBuilder.build_screen_info(current_app)
+            screen_info = MessageBuilder.build_screen_info(current_app, installed_apps=app_names)
             text_content = f"** Screen Info **\n\n{screen_info}"
 
             self._context.append(
