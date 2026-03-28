@@ -80,6 +80,8 @@ class PhoneAgent:
 
         self._context: list[dict[str, Any]] = []
         self._step_count = 0
+        self._action_count = 0
+        self._blehttp_called = False
 
     def run(self, task: str) -> str:
         """
@@ -93,6 +95,8 @@ class PhoneAgent:
         """
         self._context = []
         self._step_count = 0
+        self._action_count = 0
+        self._blehttp_called = False
 
         # First step with user prompt
         result = self._execute_step(task, is_first=True)
@@ -228,12 +232,43 @@ class PhoneAgent:
                 finish(message=str(e)), screenshot.width, screenshot.height
             )
 
+        # Increment action count
+        self._action_count += 1
+
+        # Check if bleHttp module was called and clear context after 2 action requests
+        if self._blehttp_called and self._action_count >= 2:
+            if self.agent_config.verbose:
+                print("\n🧹 Clearing context to save memory (bleHttp response)\n")
+            # Keep only the system message and the last two messages
+            if len(self._context) > 3:
+                # Keep system message and last two messages
+                self._context = [self._context[0]] + self._context[-2:]
+            # Reset counters
+            self._action_count = 0
+            self._blehttp_called = False
+        
+        # Additional context management to avoid token limit exceedance
+        # Keep only the last 3 messages plus system message
+        if len(self._context) > 4:
+            if self.agent_config.verbose:
+                print("\n🧹 Clearing context to avoid token limit exceedance\n")
+            # Keep system message and last 3 messages
+            self._context = [self._context[0]] + self._context[-3:]
+
         # Add assistant response to context
         self._context.append(
             MessageBuilder.create_assistant_message(
                 f"<think>{response.thinking}</think><answer>{response.action}</answer>"
             )
         )
+
+        # Final context check after adding new message
+        # Keep only the last 3 messages plus system message to avoid token limit exceedance
+        if len(self._context) > 4:
+            if self.agent_config.verbose:
+                print("\n🧹 Clearing context to avoid token limit exceedance\n")
+            # Keep system message and last 3 messages
+            self._context = [self._context[0]] + self._context[-3:]
 
         # Check if finished
         finished = action.get("_metadata") == "finish" or result.should_finish

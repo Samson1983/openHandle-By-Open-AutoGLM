@@ -95,19 +95,24 @@ class BLEConnection:
             logger.info(f"BLE HTTP: System info response: {self.system_info}")
         return self.system_info
 
-    def get_app_list(self, system: str | None = None) -> Dict[str, Any]:
+    def get_app_list(self, system: str | None = None, search: str | None = None) -> Dict[str, Any]:
         """
         Get list of installed applications.
 
         Args:
             system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
+            search: Search term to filter apps by name or package name.
 
         Returns:
             Response from the server as a dictionary.
         """
         url = f"{self.base_url}/applist"
-        params = {} if system is None else {"system": system}
-        logger.info(f"BLE HTTP: Getting app list with system filter: {system}")
+        params = {}
+        if system is not None:
+            params["system"] = system
+        if search is not None:
+            params["search"] = search
+        logger.info(f"BLE HTTP: Getting app list with system filter: {system}, search: {search}")
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         logger.info(f"BLE HTTP: App list response: {response.json()}")
@@ -145,17 +150,18 @@ def get_state(base_url: str) -> Dict[str, Any]:
     return conn.get_state()
 
 
-def get_app_list(base_url: str, system: str | None = None) -> Dict[str, Any]:
+def get_app_list(base_url: str, system: str | None = None, search: str | None = None) -> Dict[str, Any]:
     """
     Quick helper to get app list.
 
     Args:
         base_url: Base URL of the BLE HTTP server.
         system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
+        search: Search term to filter apps by name or package name.
 
     Returns:
         Response from the server as a dictionary.
     """
-    logger.info(f"BLE HTTP: Getting app list from {base_url} with system filter: {system}")
+    logger.info(f"BLE HTTP: Getting app list from {base_url} with system filter: {system}, search: {search}")
     conn = BLEConnection(base_url)
-    return conn.get_app_list(system)
+    return conn.get_app_list(system, search)

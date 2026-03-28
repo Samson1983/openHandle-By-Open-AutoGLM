@@ -190,15 +190,16 @@ class DeviceFactory:
             return []
         return self.module.list_devices()
 
-    def get_app_list(self, device_id: str | None = None, system: str | None = None):
+    def get_app_list(self, device_id: str | None = None, system: str | None = None, search: str | None = None):
         """Get list of installed applications.
         
         Args:
             device_id: Optional device ID.
             system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
+            search: Search term to filter apps by name or package name.
         """
         if self.device_type == DeviceType.BLE_HTTP:
-            return self.module.get_app_list(self.blehttp_url, system)
+            return self.module.get_app_list(self.blehttp_url, system, search)
         # For ADB and other device types, return empty list for now
         # In the future, we could implement this for other device types
         return []
