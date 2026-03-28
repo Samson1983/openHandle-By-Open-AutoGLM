@@ -20,6 +20,11 @@ from phone_agent.bleHttp.input import (
     copy,
     paste,
     type_text,
+    press_enter,
+    press_backspace,
+    press_esc,
+    press_space,
+    press_delete,
 )
 from phone_agent.bleHttp.screenshot import get_screenshot
 
@@ -42,6 +47,11 @@ __all__ = [
     "type_text",
     "copy",
     "paste",
+    "press_enter",
+    "press_backspace",
+    "press_esc",
+    "press_space",
+    "press_delete",
     # Screenshot
     "get_screenshot",
 ]

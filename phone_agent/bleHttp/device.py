@@ -319,7 +319,27 @@ def enter(base_url: str) -> Dict[str, Any]:
 
 def ikeyboard(base_url: str, key1: str = "0x87", key2: str = "0xB0", duration: int = 100) -> Dict[str, Any]:
     """
-    Send custom keyboard commands (home, back, recent apps, etc.).
+    ikeyboard - 自定义按钮:可实现home\back\最近任务等
+    
+    示例 URL: `http://192.168.2.99:9123/ikeyboard?key1=0x87&key2=0xB0&duration=100`
+    
+    ---------组合建-----------
+    key1:
+     0x87 = 触发这些安卓特殊键的功能前缀（Application 键）
+    key2:
+     0xB0 = Home（主页）
+     0xB1 = Back（返回）
+     0xB2 = Menu（菜单）
+     0xB3 = Recent Apps（最近任务 / 多任务）
+    ---------单键-----------
+    key1:
+     0x00 = 不触发特殊键的功能
+    key2:
+     0xB0= 回车；KEY_RETURN
+     0xB2= 退格键；KEY_BACKSPACE
+     0xB1= Esc键；KEY_ESC
+     0xB4= 空格键；KEY_SPACE_BAR
+     0xD4= KEY_DELETE
 
     Args:
         base_url: Base URL of the BLE HTTP server.

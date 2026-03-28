@@ -97,7 +97,13 @@ class BLEConnection:
 
     def get_app_list(self, system: str | None = None, search: str | None = None) -> Dict[str, Any]:
         """
-        Get list of installed applications.
+        获取应用列表
+        
+        示例 URL: `http://192.168.0.115:9123/applist?search=微信`  (搜索应用名称或包名包含"微信"的应用)
+        示例 URL: `http://192.168.0.115:9123/applist`  (默认只获取非系统应用)
+        示例 URL: `http://192.168.0.115:9123/applist?system=true`  (只获取系统应用)
+        示例 URL: `http://192.168.0.115:9123/applist?system=all`  (获取全部应用)
+        示例 URL: `http://192.168.0.115:9123/applist?system=false&search=QQ`  (搜索非系统应用中名称或包名包含"QQ"的应用)
 
         Args:
             system: Filter for system apps. None for non-system apps, "true" for system apps, "all" for all apps.
@@ -115,7 +121,8 @@ class BLEConnection:
         logger.info(f"BLE HTTP: Getting app list with system filter: {system}, search: {search}")
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
-        logger.info(f"BLE HTTP: App list response: {response.json()}")
+        # logger.info(f"BLE HTTP: App list response: {response.json()}")
+        logger.info(f"BLE HTTP: App list response: ok")
         return response.json()
 
 
@@ -152,7 +159,13 @@ def get_state(base_url: str) -> Dict[str, Any]:
 
 def get_app_list(base_url: str, system: str | None = None, search: str | None = None) -> Dict[str, Any]:
     """
-    Quick helper to get app list.
+    获取应用列表
+    
+    示例 URL: `http://192.168.0.115:9123/applist?search=微信`  (搜索应用名称或包名包含"微信"的应用)
+    示例 URL: `http://192.168.0.115:9123/applist`  (默认只获取非系统应用)
+    示例 URL: `http://192.168.0.115:9123/applist?system=true`  (只获取系统应用)
+    示例 URL: `http://192.168.0.115:9123/applist?system=all`  (获取全部应用)
+    示例 URL: `http://192.168.0.115:9123/applist?system=false&search=QQ`  (搜索非系统应用中名称或包名包含"QQ"的应用)
 
     Args:
         base_url: Base URL of the BLE HTTP server.
