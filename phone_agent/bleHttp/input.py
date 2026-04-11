@@ -49,14 +49,13 @@ def paste(base_url: str) -> Dict[str, Any]:
     return response.json()
 
 
-def type_text(base_url: str, x: int, y: int, content: str) -> Dict[str, Any]:
+def type_text(base_url: str, content: str) -> Dict[str, Any]:
     """
-    Input Chinese text into the device at the specified coordinates.
+    输入中文到手机
+    示例 URL: `http://192.168.0.115:9123/input/text?content=你好世界`
 
     Args:
         base_url: Base URL of the BLE HTTP server.
-        x: X coordinate of the input field.
-        y: Y coordinate of the input field.
         content: The text to input (supports Chinese).
 
     Returns:
@@ -64,8 +63,8 @@ def type_text(base_url: str, x: int, y: int, content: str) -> Dict[str, Any]:
     """
     ensure_connected(base_url)
     url = f"{base_url}/input/text"
-    params = {"x": x, "y": y, "content": content}
-    logger.info(f"BLE HTTP: Typing text at ({x}, {y}): {content}")
+    params = {"content": content}
+    logger.info(f"BLE HTTP: Typing text: {content}")
     response = requests.get(url, params=params, timeout=10)
     response.raise_for_status()
     logger.info(f"BLE HTTP: Type text response: {response.json()}")

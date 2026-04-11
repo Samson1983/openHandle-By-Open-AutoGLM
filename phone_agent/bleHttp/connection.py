@@ -121,8 +121,8 @@ class BLEConnection:
         logger.info(f"BLE HTTP: Getting app list with system filter: {system}, search: {search}")
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
-        # logger.info(f"BLE HTTP: App list response: {response.json()}")
-        logger.info(f"BLE HTTP: App list response: ok")
+        logger.info(f"BLE HTTP: App list response: {response.json()}")
+  
         return response.json()
 
 

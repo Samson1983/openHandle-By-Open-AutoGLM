@@ -69,7 +69,7 @@ except Exception as e:
 # Test input interfaces
 print('\n3. Testing input interfaces:')
 try:
-    type_text('http://192.168.0.202:9123', 300, 500, '测试文本')
+    type_text('http://192.168.0.202:9123', '测试文本')
     print('   type_text: successful')
 except Exception as e:
     print(f'   type_text: failed - {e}')

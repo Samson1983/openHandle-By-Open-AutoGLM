@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from phone_agent.actions import ActionHandler
-from phone_agent.actions.handler import do, finish, parse_action
+from phone_agent.actions.handler import ActionResult, do, finish, parse_action
 from phone_agent.config import get_messages, get_system_prompt
 from phone_agent.device_factory import get_device_factory
 from phone_agent.model import ModelClient, ModelConfig
@@ -108,6 +108,27 @@ class PhoneAgent:
                 return result.message or "Task completed"
 
         return "Max steps reached"
+
+    def open_app(self, app_name: str) -> ActionResult:
+        """
+        Open a specific app directly.
+
+        Args:
+            app_name: Name of the app to open.
+
+        Returns:
+            ActionResult indicating success.
+        """
+        from phone_agent.actions.handler import do
+        
+        # Create launch action
+        action = do(action="Launch", app=app_name)
+        
+        # Execute the action
+        device_factory = get_device_factory()
+        screenshot = device_factory.get_screenshot(self.agent_config.device_id)
+        
+        return self.action_handler.execute(action, screenshot.width, screenshot.height)
 
     def step(self, task: str | None = None) -> StepResult:
         """
