@@ -134,6 +134,10 @@ class ActionHandler:
             return ActionResult(False, False, "No element coordinates")
 
         x, y = self._convert_relative_to_absolute(element, width, height)
+        print("-------------------------")
+        print("width=",width)
+        print("height=",height)
+
 
         # Check for sensitive operation
         if "message" in action:

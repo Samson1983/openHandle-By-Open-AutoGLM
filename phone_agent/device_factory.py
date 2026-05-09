@@ -159,7 +159,7 @@ class DeviceFactory:
         if self.device_type == DeviceType.BLE_HTTP:
             # BLE HTTP requires coordinates for text input
             # For simplicity, we'll use a default position
-            return self.module.type_text(self.blehttp_url, 500, 1000, text)
+            return self.module.type_text(self.blehttp_url, text)
         return self.module.type_text(text, device_id)
 
     def clear_text(self, device_id: str | None = None):
