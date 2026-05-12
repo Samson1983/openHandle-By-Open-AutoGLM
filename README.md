@@ -40,6 +40,15 @@ Agent 即可自动解析意图、理解当前界面、规划下一步动作并�
 3.手机安装apk（开源)；
 4.连接控制即可：演示；
 
+### 源码及固件：
+
+
+OpenHandle-By-Open-AutoGLM：https://github.com/Samson1983/OpenHandle-By-Open-AutoGLM
+
+OpenHandle-APP：https://github.com/Samson1983/OpenHandle-APP
+
+app及固件下载：https://github.com/Samson1983/OpenHandle-APP/releases
+
 
 
  ## 快速安装

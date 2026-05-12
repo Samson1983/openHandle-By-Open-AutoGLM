@@ -31,12 +31,20 @@ The app provides screen awareness for large models through screenshots. The agen
 ## Usage Steps:
 
 1. First, download openHandle-By-Open-AutoGLM (open source).
-
 2. If you have ESP32C3 hardware, download the SDK and flash it, or purchase the hardware directly;
-
 3. Install the APK (open source) on your phone;
-
 4. Connect and control it: Demo available;
+
+### Source Code and Firmware:
+
+OpenHandle-By-Open-AutoGLM: https://github.com/Samson1983/OpenHandle-By-Open-AutoGLM
+
+OpenHandle-APP: https://github.com/Samson1983/OpenHandle-APP
+
+App and Firmware Download: https://github.com/Samson1983/OpenHandle-APP/releases
+
+
+
 
 ## Quick Installation
 
